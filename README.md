@@ -1,2 +1,2 @@
-1. Для подключения к бд в файле appsetting.json измените параметр ConnectionString
-2. Для первой генерации перейдите по адресу http://localhost:5165/CreateDB и нажмите CreateDB
+1. Before starting, change the application configuration, change the parameter "ConnectionString" in appsetting.json
+2. For the first launch, go to: http://localhost:5165/CreateDB, and click: CreateDB
