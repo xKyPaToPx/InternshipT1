@@ -6,7 +6,7 @@
     
     private void Create()
     {
-        using (DataBase.ApplicationContext db = new DataBase.ApplicationContext())
+        using (SpyContext.ApplicationContext db = new DataBase.ApplicationContext())
         {
             db.Database.EnsureDeleted();
             db.Database.EnsureCreated();

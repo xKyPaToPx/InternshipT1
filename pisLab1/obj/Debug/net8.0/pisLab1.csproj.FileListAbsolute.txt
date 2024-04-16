@@ -64,3 +64,4 @@ C:\Other\BSTUs2\PIS\lab\pisLab1\pisLab1\bin\Debug\net8.0\runtimes\win\lib\net6.0
 C:\Other\BSTUs2\PIS\lab\pisLab1\pisLab1\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 C:\Other\BSTUs2\PIS\lab\pisLab1\pisLab1\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 C:\Other\BSTUs2\PIS\lab\pisLab1\pisLab1\obj\Debug\net8.0\pisLab1.csproj.Up2Date
+C:\Other\BSTUs2\PIS\lab\pisLab1\pisLab1\obj\Debug\net8.0\pisLab1.sourcelink.json
