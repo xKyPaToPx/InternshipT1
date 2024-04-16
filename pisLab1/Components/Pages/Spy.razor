@@ -1,0 +1,390 @@
+﻿@page "/"
+@using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
+<h3>List of spies</h3>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>FirstName</th>
+        <th>SecondName</th>
+        <th>Alias</th>
+        <th>DateOfBirth</th>
+        <th>Nationality</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var spy in _spies)
+    {
+        @if (spy == editableSpy)
+        {
+            <tr>
+                <td>@spy.Id</td>
+                <td><InputText @bind-Value="spy.FirstName"/></td>
+                <td><InputText @bind-Value="spy.SecondName"/></td>
+                <td><InputText @bind-Value="spy.Alias"/></td>
+                <td><InputDate @bind-Value="spy.DateOfBirth"/></td>
+                <td><InputText @bind-Value="spy.Nationality"/></td>
+                <td>
+                    <button @onclick="() => SaveSpy(spy)">Save</button>
+                    <button @onclick="() => DeleteSpy(spy)">Delete</button>
+                </td>
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td>@spy.Id</td>
+                <td>@spy.FirstName</td>
+                <td>@spy.SecondName</td>
+                <td>@spy.Alias</td>
+                <td>@spy.DateOfBirth</td>
+                <td>@spy.Nationality</td>
+                <td>
+                    <button @onclick="() => EditSpy(spy)">Edit</button>
+                    <button @onclick="() => DeleteSpy(spy)">Delete</button>
+                </td>
+            </tr>
+        }
+        
+    }
+    </tbody>
+</table>
+<button @onclick="AddSpy">+</button>
+
+<h3>List of missions</h3>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>SpyId</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var mission in _missions)
+    {
+        @if (editableMission != null && mission.Id == editableMission.Id)
+        {
+            <tr>
+                <td>@mission.Id</td>
+                <td><InputText @bind-Value="mission.Name"/></td>
+                <td><InputText @bind-Value="mission.Description"/></td>
+                <td><InputSelect @bind-Value="editGuid">
+                    <option value="-1" disabled>(select)</option>
+                    @foreach (var spyInfo in _spies)
+                    {
+                        <option value="@spyInfo.Id">
+                            @spyInfo.Id;
+                        </option>
+                    }
+                </InputSelect></td>
+                <td>
+                    <button @onclick="() => SaveMission(mission)">Save</button>
+                    <button @onclick="() => DeleteMission(mission)">Delete</button>
+                </td>
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td>@mission.Id</td>
+                <td>@mission.Name</td>
+                <td>@mission.Description</td>
+                <td>@mission.SpyId.Id</td>
+                <td>
+                    <button @onclick="() => EditMission(mission)">Edit</button>
+                    <button @onclick="() => DeleteMission(mission)">Delete</button>
+                </td>
+            </tr>
+        }
+        
+    }
+    </tbody>
+</table>
+<button @onclick="AddMission">+</button>
+
+<h3>List of equipments</h3>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>SpyId</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var equipment in _equipments)
+    {
+        @if (editableEquipment != null && equipment.Id == editableEquipment.Id)
+        {
+            <tr>
+                <td>@equipment.Id</td>
+                <td><InputText @bind-Value="equipment.Name"/></td>
+                <td><InputText @bind-Value="equipment.Description"/></td>
+                <td><InputSelect @bind-Value="editGuid">
+                    @foreach (var spyInfo in _spies)
+                    {
+                        <option value="@spyInfo.Id">
+                            @spyInfo.Id;
+                        </option>
+                    }
+                </InputSelect></td>
+                    
+                <td>
+                    <button @onclick="() => SaveEquipment(equipment)">Save</button>
+                    <button @onclick="() => DeleteEquipment(equipment)">Delete</button>
+                </td>
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td>@equipment.Id</td>
+                <td>@equipment.Name</td>
+                <td>@equipment.Description</td>
+                <td>@equipment.SpyId.Id</td>
+                <td>
+                    <button @onclick="() => EditEquipment(equipment)">Edit</button>
+                    <button @onclick="() => DeleteEquipment(equipment)">Delete</button>
+                </td>
+            </tr>
+        }
+        
+    }
+    </tbody>
+</table>
+<button @onclick="AddEquipment">+</button>
+
+@code {
+    Guid? editGuid;
+    List<pisLab1.Spy> _spies = new List<pisLab1.Spy>();
+    List<Mission> _missions = new List<Mission>();
+    List<Equipment> _equipments = new List<Equipment>();
+    pisLab1.Spy? editableSpy;
+    Mission? editableMission;
+    Equipment? editableEquipment;
+    bool IsNewSpy;
+    bool IsNewMission;
+    bool IsNewEquipment;
+    protected override void OnInitialized()
+    {
+        Init();
+        
+        Console.WriteLine("!!!!!!!!");
+    }
+    private void Init()
+    {
+        using(DataBase.ApplicationContext db = new DataBase.ApplicationContext())
+        {
+            _spies = db.Spies.ToList();
+            _missions = db.Missions.ToList();
+            _equipments = db.Equipments.ToList();
+        }
+    }
+
+    
+
+    #region Spy
+
+    private void EditSpy(pisLab1.Spy spy)
+    {
+        editableSpy = spy;
+    }
+
+    private void DeleteSpy(pisLab1.Spy spy)
+    {
+        using(DataBase.ApplicationContext db = new DataBase.ApplicationContext())
+        {
+            db.Spies.Remove(spy);
+            db.SaveChanges();
+            Init();
+        }
+    }
+
+    private void AddSpy()
+    {
+        var newSpy = new pisLab1.Spy { Id = Guid.NewGuid() };
+        _spies.Add(newSpy);
+        editableSpy = newSpy;
+        IsNewSpy = true;
+    }
+
+    private void SaveSpy(pisLab1.Spy spy)
+    {
+        if (IsNewSpy)
+        {
+            using (DataBase.ApplicationContext db = new DataBase.ApplicationContext())
+            {
+                db.Spies.Add(spy);
+                db.SaveChanges();
+            }
+        }
+        else
+        {
+            using(DataBase.ApplicationContext db = new DataBase.ApplicationContext())
+            {
+                foreach (var sp in db.Spies.ToList())
+                {
+                    if (sp.Id == spy.Id)
+                    {
+                        sp.FirstName = spy.FirstName;
+                        sp.SecondName = spy.SecondName;
+                        sp.Alias = spy.Alias;
+                        sp.DateOfBirth = spy.DateOfBirth;
+                        sp.Nationality = spy.Nationality;
+                    }
+                }
+                db.SaveChanges();
+                Init();
+            }
+        }
+
+        IsNewSpy = false;
+        editableSpy = null;
+
+    }
+
+    #endregion
+    
+
+    #region Mission
+
+    private void SaveMission(Mission mission)
+    {
+        if (IsNewMission)
+        {
+            using (DataBase.ApplicationContext db = new DataBase.ApplicationContext())
+            {
+                var spy = db.Spies.Find(editGuid);
+                mission.SpyId = spy;
+                db.Missions.Add(mission);
+                db.SaveChanges();
+            }
+        }
+        else
+        {
+            using(DataBase.ApplicationContext db = new DataBase.ApplicationContext())
+            {
+                //Console.WriteLine($"{mission.Name} {mission.SpyId.Id}");
+                pisLab1.Spy newSpy = db.Spies.Find(editGuid);
+                foreach (var mission1 in db.Missions)
+                {
+                    if (mission1.Id == mission.Id)
+                    {
+                        mission1.Name = mission.Name;
+                        mission1.Description = mission.Description;
+                        mission1.SpyId = newSpy;
+
+                    }
+                }
+                db.SaveChanges();
+                Init();
+            }
+        }
+
+        IsNewMission = false;
+        editableMission = null;
+    }
+
+    private void DeleteMission(Mission mission)
+    {
+        using(DataBase.ApplicationContext db = new DataBase.ApplicationContext())
+        {
+            db.Missions.Remove(mission);
+            db.SaveChanges();
+            Init();
+        }
+    }
+
+
+    
+
+    private void EditMission(Mission mission)
+    {
+        editableMission = mission;
+        editGuid = editableMission.SpyId.Id;
+    }
+
+    private void AddMission()
+    {
+        var newMission = new Mission{ Id = Guid.NewGuid() };
+        _missions.Add(newMission);
+        editableMission = newMission;
+        IsNewMission = true;
+    }
+
+    #endregion
+   
+
+    #region Equipment
+
+    private void SaveEquipment(Equipment equipment)
+    {
+        if (IsNewEquipment)
+        {
+            using (DataBase.ApplicationContext db = new DataBase.ApplicationContext())
+            {
+                var spy = db.Spies.Find(editGuid);
+                equipment.SpyId = spy;
+                db.Equipments.Add(equipment);
+                db.SaveChanges();
+            }
+        }
+        else
+        {
+            using(DataBase.ApplicationContext db = new DataBase.ApplicationContext())
+            {
+                pisLab1.Spy newSpy = db.Spies.Find(editGuid);
+                foreach (var equipment1 in db.Equipments.ToList())
+                {
+                    if (equipment1.Id == equipment.Id)
+                    {
+                        equipment1.Name = equipment.Name;
+                        equipment1.Description = equipment.Description;
+                        equipment1.SpyId = newSpy;
+                    }
+                }
+                db.SaveChanges();
+                Init();
+            }
+        }
+
+        IsNewEquipment = false;
+        editableEquipment = null;
+    }
+    
+    private void DeleteEquipment(Equipment equipment)
+    {
+        using(DataBase.ApplicationContext db = new DataBase.ApplicationContext())
+        {
+            db.Equipments.Remove(equipment);
+            db.SaveChanges();
+            Init();
+        }
+    }
+
+    private void EditEquipment(Equipment equipment)
+    {
+        editableEquipment = equipment;
+        editGuid = editableEquipment.SpyId.Id;
+    }
+
+    private void AddEquipment() 
+    {
+        var newEquipment = new Equipment(){ Id = Guid.NewGuid() };
+        _equipments.Add(newEquipment);
+        editableEquipment = newEquipment;
+        IsNewEquipment = true;
+    }
+
+    #endregion
+   
+
+}
