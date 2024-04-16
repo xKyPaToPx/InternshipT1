@@ -2,7 +2,7 @@
 
 namespace pisLab1;
 
-public class DataBase
+public class SpyContext
 {
     public static DbContextOptions<ApplicationContext> Options { get; set; }
 

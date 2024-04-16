@@ -19,14 +19,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 
-// Configure database
-var dbBuilder = new ConfigurationBuilder();
-dbBuilder.SetBasePath(Directory.GetCurrentDirectory());
-dbBuilder.AddJsonFile("appsettings.json");
-var config = dbBuilder.Build();
-var connectionString = config.GetConnectionString("DefaultConnection");
-var optionsBuilder = new DbContextOptionsBuilder<DataBase.ApplicationContext>();
-DataBase.Options = optionsBuilder.UseSqlServer(connectionString).Options;
+
 
 
 app.UseHttpsRedirection();
