@@ -1,0 +1,9 @@
+# Intellij
+.idea/
+*.iml
+*.iws
+
+
+# C Sharp
+*.bin
+Debug/

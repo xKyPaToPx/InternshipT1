@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace pisLab1;
 
@@ -6,6 +7,17 @@ public class SpyContext
 {
     public static DbContextOptions<ApplicationContext> Options { get; set; }
 
+    public static void Load()
+    {
+        var dbBuilder = new ConfigurationBuilder();
+        dbBuilder.SetBasePath(Directory.GetCurrentDirectory());
+        dbBuilder.AddJsonFile("appsettings.json");
+        var config = dbBuilder.Build();
+        var connectionString = config.GetConnectionString("DefaultConnection");
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+        Options = optionsBuilder.UseSqlServer(connectionString).Options;
+    }
+    
     public static void Create()
     {
         using (ApplicationContext db = new ApplicationContext())
@@ -13,8 +25,8 @@ public class SpyContext
             db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
             
-            pisLab1.Spy spy1 = new pisLab1.Spy {Id = Guid.NewGuid(), FirstName = "John", SecondName = "Doe",Alias = "Pol", DateOfBirth = DateTime.Now, Nationality = "Russian"};;
-            pisLab1.Spy spy2 = new pisLab1.Spy {Id = Guid.NewGuid(), FirstName = "Jole", SecondName = "Doe",Alias = "Ron", DateOfBirth = DateTime.Now, Nationality = "Russian"};;
+            Spy spy1 = new Spy {Id = Guid.NewGuid(), FirstName = "John", SecondName = "Doe",Alias = "Pol", DateOfBirth = DateTime.Now, Nationality = "Russian"};;
+            Spy spy2 = new Spy {Id = Guid.NewGuid(), FirstName = "Jole", SecondName = "Doe",Alias = "Ron", DateOfBirth = DateTime.Now, Nationality = "Russian"};;
             db.Spies.AddRange(spy1,spy2);
 
             Mission mission1 = new Mission { Id = Guid.NewGuid(), Name = "Day x", Description = "Random data", SpyId = spy1 };
